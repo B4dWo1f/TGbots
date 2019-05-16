@@ -7,16 +7,13 @@ from random import choice
 import tools
 import geoip
 import check
+from functools import wraps
+import credentials as CR
 import os
 here = os.path.dirname(os.path.realpath(__file__))
 
 
-def get_credentials(api_file=here+'/telegram_bot.private'):
-   api_key = open(api_file,'r').read().strip().splitlines()
-   bot_token = decode(api_key[0]).decode('utf-8')
-   bot_chatID = decode(api_key[1]).decode('utf-8')
-   return bot_token, bot_chatID
-
+## Action functions
 def send_picture(bot,chatID,pic,msg='This is your picture',rm=True):
    photo = open(pic, 'rb')
    bot.send_photo(chatID, photo, caption=msg,timeout=50)
@@ -28,6 +25,7 @@ def send_sound(bot,chatID,audio,msg='This is your picture',rm=True):
    if rm: os.system('rm %s'%(audio))
 
 
+## Callback functions
 def hola(bot,update):
    """ echo-like service to check system status """
    chatID = update.message.chat_id
@@ -42,6 +40,7 @@ def screen_lock(bot,update):
    os.system(com)
    bot.send_message(chat_id=chatID, text='Screen locked',parse_mode='Markdown')
 
+@CR.restricted
 def screenshot(bot,update):
    """
    Take a screenshot and send it
@@ -54,6 +53,7 @@ def screenshot(bot,update):
    bot.send_message(chatID, text=txt,parse_mode='Markdown')
    send_picture(bot,chatID,pic,msg='Here it is the screenshot')
 
+@CR.restricted
 def picture(bot,update):
    """
    Take a picture from the webcam and send it
@@ -69,6 +69,7 @@ def picture(bot,update):
       os.system(com)
       send_picture(bot,chatID,pic,msg='Picture from %s'%(dev))
 
+@CR.restricted
 def sound(bot,update):
    """
    Work in progress
@@ -104,6 +105,15 @@ def whoSthere(bot,update):
       l = l.replace('(','(*').replace(')','*)')
       txt += l + '\n--\n'
    bot.send_message(chatID, text=txt[:-2],parse_mode='Markdown')
+
+def whoami(bot,update):
+   """ echo-like service to check system status """
+   chatID = update.message.chat_id
+   ch = update.message['chat']
+   txt = 'username: %s %s\n'%(ch['first_name'],ch['last_name'])
+   txt += 'username: %s \n'%(ch['username'])
+   txt += 'id: %s'%(ch['id'])
+   bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
 
 def help_msg(bot,update):
    """ Display this help message """
