@@ -48,8 +48,8 @@ if __name__ == '__main__':
    here = os.path.dirname(os.path.realpath(__file__))
    try: token = sys.argv[1]
    except IndexError:
-      if os.path.isfile(here+'/telegram_bot.private'):
-         token = here+'/telegram_bot.private'
+      if os.path.isfile(here+'/RAVENsys.token'):
+         token = here+'/RAVENsys.token'
       else:
          print('File not specified')
          exit()
