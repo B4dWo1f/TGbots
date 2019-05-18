@@ -15,13 +15,13 @@ from threading import Thread
 import sys
 from telegram.ext import Updater
 import onlyfunctions as f
-from telegram.ext import CommandHandler
+from telegram.ext import CommandHandler, MessageHandler, Filters
 import credentials as CR
 
 token, chatID = CR.get_credentials()
 updater = Updater(token=token)
 dispatcher = updater.dispatcher
-
+j = updater.job_queue
 
 def start(bot, update):
    txt = "I'm a bot, please talk to me!"
@@ -52,7 +52,6 @@ def restart(bot,update):
    bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
    #update.message.reply_text('Bot is restarting...')
    Thread(target=stop_and_restart).start()
-   bot.send_message(chat_id=chatID, text='It should be working now', parse_mode='Markdown')
 
 
 # Start
@@ -62,7 +61,7 @@ dispatcher.add_handler(start_handler)
 # Re-Load
 dispatcher.add_handler(CommandHandler('reload', restart))
 # Hola
-hola_handler = CommandHandler('hola', f.hola)
+hola_handler = CommandHandler('hola', f.hola, pass_job_queue=True)
 dispatcher.add_handler(hola_handler)
 # Lock
 lock_handler = CommandHandler('lock', f.screen_lock)
@@ -71,7 +70,7 @@ dispatcher.add_handler(lock_handler)
 screenshot_handler = CommandHandler('screenshot', f.screenshot)
 dispatcher.add_handler(screenshot_handler)
 # Picture
-picture_handler = CommandHandler('picture', f.picture)
+picture_handler = CommandHandler('picture', f.picture, pass_job_queue=True)
 dispatcher.add_handler(picture_handler)
 # Sound
 sound_handler = CommandHandler('sound', f.sound)
@@ -91,6 +90,12 @@ dispatcher.add_handler(help_handler)
 # Stop
 stop_handler = CommandHandler('stop', stop)
 dispatcher.add_handler(stop_handler)
+### Testing ####################################################################
+import testing as tst
+location_handler = MessageHandler(Filters.location, tst.location, 
+                                                          edited_updates=True)
+dispatcher.add_handler(location_handler)
+
 
 
 

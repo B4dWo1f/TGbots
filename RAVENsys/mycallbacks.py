@@ -1,65 +1,56 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
-import threading
-from base64 import b64decode as decode
+from threading import Thread
 from random import choice
 import tools
 import geoip
 import check
-from functools import wraps
-import credentials as CR
 import os
-here = os.path.dirname(os.path.realpath(__file__))
-
+import credentials as CR
 
 ## Action functions
-def send_picture(bot,chatID,job_queue,pic,msg='This is your picture',rm=True,delete=True):
-   photo = open(pic, 'rb')
-   M = bot.send_photo(chatID, photo, caption=msg,timeout=50)
-   if rm: os.system('rm %s'%(pic))
-   if delete: job_queue.run_once(call_delete, 60, context=M)
-
-def send_sound(bot,chatID,audio,msg='This is your picture',rm=True):
-   mp3 = open(audio, 'rb')
-   bot.send_audio(chatID, mp3, caption=msg,timeout=50)
-   if rm: os.system('rm %s'%(audio))
-
-
-## Callback functions
-def hola(bot,update, job_queue):
-   """ echo-like service to check system status """
-   chatID = update.message.chat_id
-   salu2 = ['What\'s up?', 'Oh, hi there!', 'How you doin\'?', 'Hello!']
-   txt = choice(salu2)
-   M = bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
-   job_queue.run_once(call_delete, 60, context=M)
-
 def call_delete(bot, job):
+   """ Delets a message. The message has to be provided in job.context """
    chatID = job.context['chat']['id']
    msgID = job.context['message_id']
    bot.delete_message(chatID,msgID)
 
+def send_picture(bot,chatID,job_queue,pic,msg='',t=10,rm=True,delete=True):
+   """
+     Send a picture and, optionally, remove it locally/remotely (rm/delete)
+     msg = caption of the picture
+     t = time to wait to delete the remote picture
+     rm = remove local file
+     delete = remove remote file
+   """
+   photo = open(pic, 'rb')
+   M = bot.send_photo(chatID, photo, caption=msg,timeout=50)
+   if rm: os.system('rm %s'%(pic))
+   if delete: job_queue.run_once(call_delete, t, context=M)
 
-def screen_lock(bot,update):
-   """ Lock the computer """
-   chatID = update.message.chat_id
-   com = 'gnome-screensaver-command --lock'
-   os.system(com)
-   bot.send_message(chat_id=chatID, text='Screen locked',parse_mode='Markdown')
+def send_sound(bot,chatID,job_queue,audio,msg='',t=10,rm=True,delete=True):
+   mp3 = open(audio, 'rb')
+   bot.send_audio(chatID, mp3, caption=msg,timeout=50)
+   if rm: os.system('rm %s'%(audio))
+   if delete: job_queue.run_once(call_delete, t, context=M)
 
+
+
+# Sentinel functions
 @CR.restricted
-def screenshot(bot,update):
+def screenshot(bot,update,job_queue):
    """
    Take a screenshot and send it
    """
    chatID = update.message.chat_id
-   pic = '/tmp/screenshot.png'
+   pic = '/tmp/screenshot.jpg'
    com = 'scrot -z %s'%(pic)
    os.system(com)
    txt = 'Please be patient, this usually takes a few seconds'
-   bot.send_message(chatID, text=txt,parse_mode='Markdown')
-   send_picture(bot,chatID,pic,msg='Here it is the screenshot')
+   M = bot.send_message(chatID, text=txt,parse_mode='Markdown')
+   send_picture(bot,chatID,job_queue,pic,msg='Here it is the screenshot',t=10)
+   bot.delete_message(chatID,M['message_id'])
 
 @CR.restricted
 def picture(bot,update,job_queue):
@@ -78,14 +69,12 @@ def picture(bot,update,job_queue):
       com = 'ffmpeg -y -v 0 -f video4linux2 -s 640x480 -i %s -ss 0:0:5'%(dev)
       com += ' -frames 1 %s'%(pic)
       os.system(com)
-      send_picture(bot,chatID,job_queue,pic,msg='Picture from %s'%(dev),delete=True)
+      txt = 'Picture from %s'%(dev)
+      send_picture(bot,chatID,job_queue,pic,msg=txt,t=10,delete=True)
 
 @CR.restricted
 def sound(bot,update):
-   """
-   Work in progress
-   TODO: send mp3 file
-   """
+   """ Record and send audio from computers microphone """
    chatID = update.message.chat_id
    f = '/tmp/recording.mp3'
    com = 'sox -t alsa default %s silence 1 0.1 1%% 1 1.0 5%%'%(f)
@@ -126,17 +115,19 @@ def whoami(bot,update):
    txt += 'id: %s'%(ch['id'])
    bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
 
-def help_msg(bot,update):
-   """ Display this help message """
+# Admin functions
+def hola(bot, update, job_queue):
+   """ echo-like service to check system status """
    chatID = update.message.chat_id
-   txt = 'These are the available commands:\n'
-   txt += '- *hola*: Echo service to check on service status\n'
-   txt += '- *lock*: Lock the computer\n'
-   txt += '- *picture*: Take a picture from the webcam and send it\n'
-   txt += '- *screenshot*: Take a screenshot and send it\n'
-   txt += '- *sound*: Record sound from the microphone and send it\n'
-   txt += '- *where*: Return the IP where the bot is running\n'
-   txt += '- *whothere*: Show the devices connected to the bot\'s network\n'
-   txt += '- *help*: Display this help message\n'
-   txt += '- *stop*: Stop the bot'
-   bot.send_message(chatID, text=txt,parse_mode='Markdown')
+   salu2 = ['What\'s up?', 'Oh, hi there!', 'How you doin\'?', 'Hello!']
+   txt = choice(salu2)
+   M = bot.send_message(chatID, text=txt,
+                        parse_mode='Markdown')
+
+def screen_lock(bot,update):
+   """ Lock the computer """
+   chatID = update.message.chat_id
+   com = 'gnome-screensaver-command --lock'
+   os.system(com)
+   bot.send_message(chat_id=chatID, text='Screen locked',
+                    disable_notification=True, parse_mode='Markdown')
