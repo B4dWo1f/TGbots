@@ -74,6 +74,7 @@ if __name__ == '__main__':
    dpt.add_handler(CommandHandler('where', cb.whereRyou))
    dpt.add_handler(CommandHandler('whothere', cb.whoSthere))
    dpt.add_handler(CommandHandler('whoami', cb.whoami))
+   dpt.add_handler(CommandHandler('who', cb.who))
 
 
    #admin handlers

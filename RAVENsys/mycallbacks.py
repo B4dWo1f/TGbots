@@ -115,6 +115,14 @@ def whoami(bot,update):
    txt += 'id: %s'%(ch['id'])
    bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
 
+def who(bot,update):
+   """ echo-like service to check system status """
+   chatID = update.message.chat_id
+   ch = update.message['chat']
+   txt = 'Users in the computer:\n'
+   txt += os.popen('who -s').read().strip()
+   bot.send_message(chatID, text=txt, parse_mode='Markdown')
+
 # Admin functions
 def hola(bot, update, job_queue):
    """ echo-like service to check system status """
@@ -131,3 +139,17 @@ def screen_lock(bot,update):
    os.system(com)
    bot.send_message(chat_id=chatID, text='Screen locked',
                     disable_notification=True, parse_mode='Markdown')
+
+def conference_mode(bot,update):
+   """
+   Put the laptop in conference mode:
+   - low brightness
+   - restricted crontab
+   - default background
+   """
+   chatID = update.message.chat_id
+   com = 'xrandr --output `xrandr -q | grep " connected" | cut -d " " -f 1` --brightness 0.1'
+   os.system(com)
+   bot.send_message(chat_id=chatID, text='Done',
+                    disable_notification=True, parse_mode='Markdown')
+
