@@ -8,18 +8,18 @@ def call_delete(bot, job):
    msgID = job.context['message_id']
    bot.delete_message(chatID,msgID)
 
-def send_picture(bot, chatID, job_queue, pic, msg='', t=60,delete=True):
+def send_picture(bot, chatID, job_queue, pic, msg='',
+                 t=60,delete=True,dis_notif=False):
    if pic[:4] == 'http': photo = pic
    else: photo = open(pic, 'rb')  # TODO raise and report if file not found
-   M = bot.send_photo(chatID, photo, caption=msg,timeout=300) 
+   M = bot.send_photo(chatID, photo, caption=msg,
+                                  timeout=300, disable_notification=dis_notif)
    if delete: job_queue.run_once(call_delete, t, context=M)
 
 
 def fcst(bot,update,job_queue,args):
    """ echo-like service to check system status """
    chatID = update.message.chat_id
-   #salu2 = ['What\'s up?', 'Oh, hi there!', 'How you doin\'?', 'Hello!']
-   #txt = choice(salu2)
    dates = [dt.datetime.strptime(d,'%d/%m/%Y-%H:%M') for d in args]
    try: dates = [dt.datetime.strptime(d,'%d/%m/%Y-%H:%M') for d in args]
    except ValueError:
@@ -29,10 +29,24 @@ def fcst(bot,update,job_queue,args):
       bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
       return
    for d in dates:
-      f = '/home/n03l/Documents/RASP/SC2/FCST/' + d.strftime('%Y/%m/%d/')
-      f += 'new_sfcwind.%s.jpg'%(d.strftime('%H00'))
+      f = locate(d, 'sfcwind')
       txt = 'Surface wind for %s'%(d.strftime('%d/%m/%Y-%H:%M'))
-      send_picture(bot, chatID, job_queue, f, msg=txt, t=300,delete=True)
+      send_picture(bot, chatID, job_queue, f, msg=txt, t=30,delete=True)
+
+def locate(date,prop):
+   UTCshift = dt.datetime.now()-dt.datetime.utcnow()
+   utcdate = date - UTCshift
+   now = dt.datetime.utcnow()
+   day = dt.timedelta(days=1)
+   if   utcdate.date() == now.date(): fol = 'SC2'
+   elif utcdate.date() == now.date()+day: fol = 'SC2+1'
+   elif utcdate.date() == now.date()+2*day: fol = 'SC4+2'
+   elif utcdate.date() == now.date()+3*day: fol = 'SC4+3'
+   else: raise
+   fname  = '/home/n03l/Documents/RASP/PLOTS/w2/%s/'%(fol)
+   fname += utcdate.strftime('%Y/%m/%d/%H00')
+   fname += '_%s.jpg'%(prop)
+   return fname
 
 
 def sounding(bot,update,job_queue,args):
@@ -54,13 +68,7 @@ def sounding(bot,update,job_queue,args):
    f = '/home/n03l/Documents/RASP/SC2/FCST/' + date.strftime('%d_%m_%Y_%H_%M')
    f += '.sounding%s.w2.png'%(index)
    txt = 'Sounding for %s at %s'%(place, date.strftime('%d/%m/%Y-%H:%M'))
-   now = dt.datetime.now()
-   day = dt.timedelta(days=1)
-   if date.date() == now.date(): fol = 'SC2'
-   elif date.date() == now.date()+day: fol = 'SC2+1'
-   elif date.date() == now.date()+2*day: fol = 'SC4+2'
-   elif date.date() == now.date()+3*day: fol = 'SC4+3'
-   else: raise
+   fol = locate(date)
    H = date.strftime('%H%M')
    url_picture = f'http://raspuri.mooo.com/RASP/'
    url_picture += f'{fol}/FCST/sounding{index}.curr.{H}lst.w2.png'
