@@ -77,7 +77,7 @@ def broadcast(bot, job):
 
 
 # Start Bot
-token = CR.get_credentials()
+token = CR.get_credentials('rasp.token')
 U = Updater(token=token)
 D = U.dispatcher
 J = U.job_queue
