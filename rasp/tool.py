@@ -2,6 +2,8 @@
 # -*- coding: UTF-8 -*-
 
 import datetime as dt
+import os
+HOME = os.getenv('HOME')
 
 def call_delete(bot, job):
    chatID = job.context['chat']['id']
@@ -43,7 +45,7 @@ def locate(date,prop):
    elif utcdate.date() == now.date()+2*day: fol = 'SC4+2'
    elif utcdate.date() == now.date()+3*day: fol = 'SC4+3'
    else: raise
-   fname  = '/home/n03l/Documents/RASP/PLOTS/w2/%s/'%(fol)
+   fname  = HOME+'/Documents/RASP/PLOTS/w2/%s/'%(fol)
    fname += utcdate.strftime('%Y/%m/%d/%H00')
    fname += '_%s.jpg'%(prop)
    return fol,fname
@@ -65,7 +67,7 @@ def sounding(bot,update,job_queue,args):
       txt += 'ex: /sounding Arcones 18/05/2019-13:00'
       bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
       return
-   f = '/home/n03l/Documents/RASP/SC2/FCST/' + date.strftime('%d_%m_%Y_%H_%M')
+   f = HOME + '/Documents/RASP/SC2/FCST/' + date.strftime('%d_%m_%Y_%H_%M')
    f += '.sounding%s.w2.png'%(index)
    txt = 'Sounding for %s at %s'%(place, date.strftime('%d/%m/%Y-%H:%M'))
    fol,_ = locate(date,'')
@@ -74,22 +76,3 @@ def sounding(bot,update,job_queue,args):
    url_picture += f'{fol}/FCST/sounding{index}.curr.{H}lst.w2.png'
    send_picture(bot, chatID, job_queue, url_picture, msg=txt, t=30,delete=True)
 
-
-#def cape(bot,update,job_queue,args):
-#   """ echo-like service to check system status """
-#   chatID = update.message.chat_id
-#   #salu2 = ['What\'s up?', 'Oh, hi there!', 'How you doin\'?', 'Hello!']
-#   #txt = choice(salu2)
-#   dates = [dt.datetime.strptime(d,'%d/%m/%Y-%H:%M') for d in args]
-#   try: dates = [dt.datetime.strptime(d,'%d/%m/%Y-%H:%M') for d in args]
-#   except ValueError:
-#      txt = 'Sorry, I didn\'t understand\n'
-#      txt += 'Usage: /fcst %d/%m/%Y-%H:%M\n'
-#      txt += 'ex: /fcst 18/05/2019-13:00'
-#      bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
-#      return
-#   for d in dates:
-#      f = '/home/n03l/Documents/RASP/SC2/FCST/' + d.strftime('%Y/%m/%d/')
-#      f += 'new_sfcwind.%s.jpg'%(d.strftime('%H00'))
-#      txt = 'Surface wind for %s'%(d.strftime('%d/%m/%Y-%H:%M'))
-#      send_picture(bot, chatID, job_queue, f, msg=txt, t=300,delete=True)
