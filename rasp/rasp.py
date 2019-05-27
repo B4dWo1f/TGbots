@@ -26,8 +26,6 @@ Bcast_chatID = '3875655'      # private
 def start(bot, update):
    txt = "I'm a bot, please talk to me!"
    bot.send_message(chat_id=update.message.chat_id, text=txt)
-   txt = "Only for me I'm a bot, please talk to me!"
-   bot.send_message(chat_id=3875655, text=txt)
 
 def shutdown():
    U.stop()
@@ -55,15 +53,6 @@ def restart(bot,update):
    bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
    Thread(target=stop_and_restart).start()
 
-#def call_delete(bot, job):
-#   chatID = job.context['chat']['id']
-#   msgID = job.context['message_id']
-#   bot.delete_message(chatID,msgID)
-#
-#def callback_minute(bot, job):
-#   M = bot.send_message(chat_id='3875655',
-#                        text='One message every minute')
-#   J.run_once(call_delete, 20, context=M)
 
 
 def broadcast(bot, job):

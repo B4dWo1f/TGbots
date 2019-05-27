@@ -29,7 +29,7 @@ def fcst(bot,update,job_queue,args):
       bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
       return
    for d in dates:
-      f = locate(d, 'sfcwind')
+      _,f = locate(d, 'sfcwind')
       txt = 'Surface wind for %s'%(d.strftime('%d/%m/%Y-%H:%M'))
       send_picture(bot, chatID, job_queue, f, msg=txt, t=30,delete=True)
 
@@ -46,7 +46,7 @@ def locate(date,prop):
    fname  = '/home/n03l/Documents/RASP/PLOTS/w2/%s/'%(fol)
    fname += utcdate.strftime('%Y/%m/%d/%H00')
    fname += '_%s.jpg'%(prop)
-   return fname
+   return fol,fname
 
 
 def sounding(bot,update,job_queue,args):
@@ -68,7 +68,7 @@ def sounding(bot,update,job_queue,args):
    f = '/home/n03l/Documents/RASP/SC2/FCST/' + date.strftime('%d_%m_%Y_%H_%M')
    f += '.sounding%s.w2.png'%(index)
    txt = 'Sounding for %s at %s'%(place, date.strftime('%d/%m/%Y-%H:%M'))
-   fol = locate(date)
+   fol,_ = locate(date,'')
    H = date.strftime('%H%M')
    url_picture = f'http://raspuri.mooo.com/RASP/'
    url_picture += f'{fol}/FCST/sounding{index}.curr.{H}lst.w2.png'
