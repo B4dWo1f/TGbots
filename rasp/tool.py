@@ -9,8 +9,9 @@ def call_delete(bot, job):
    bot.delete_message(chatID,msgID)
 
 def send_picture(bot, chatID, job_queue, pic, msg='', t=60,delete=True):
-   photo = open(pic, 'rb')
-   M = bot.send_photo(chatID, photo, caption=msg,timeout=300)
+   if pic[:4] == 'http': photo = pic
+   else: photo = open(pic, 'rb')  # TODO raise and report if file not found
+   M = bot.send_photo(chatID, photo, caption=msg,timeout=300) 
    if delete: job_queue.run_once(call_delete, t, context=M)
 
 
@@ -53,7 +54,17 @@ def sounding(bot,update,job_queue,args):
    f = '/home/n03l/Documents/RASP/SC2/FCST/' + date.strftime('%d_%m_%Y_%H_%M')
    f += '.sounding%s.w2.png'%(index)
    txt = 'Sounding for %s at %s'%(place, date.strftime('%d/%m/%Y-%H:%M'))
-   send_picture(bot, chatID, job_queue, f, msg=txt, t=300,delete=True)
+   now = dt.datetime.now()
+   day = dt.timedelta(days=1)
+   if date.date() == now.date(): fol = 'SC2'
+   elif date.date() == now.date()+day: fol = 'SC2+1'
+   elif date.date() == now.date()+2*day: fol = 'SC4+2'
+   elif date.date() == now.date()+3*day: fol = 'SC4+3'
+   else: raise
+   H = date.strftime('%H%M')
+   url_picture = f'http://raspuri.mooo.com/RASP/'
+   url_picture += f'{fol}/FCST/sounding{index}.curr.{H}lst.w2.png'
+   send_picture(bot, chatID, job_queue, url_picture, msg=txt, t=30,delete=True)
 
 
 #def cape(bot,update,job_queue,args):
