@@ -32,8 +32,9 @@ def shutdown():
 
 @CR.restricted
 def stop(bot, update):
+   chatID = update.message.chat_id
    txt = 'I\'ll be shutting down\nI hope to see you soon!'
-   bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
+   bot.send_message(chatID, text=txt, parse_mode='Markdown')
    Thread(target=shutdown).start()
 
 def stop_and_restart():
@@ -82,7 +83,7 @@ def callback_30(bot, job):
 
 
 def callback_8(bot, job):
-   print('Starting automatic broadcast 8')
+   LG.info('Starting automatic 8:00 broadcast')
    to_send = []
    for f in files:
       h = f.split('.')[-2]
@@ -95,7 +96,7 @@ def callback_8(bot, job):
          #send_picture(bot, chatID, J, f, msg=txt, t=3*3600, delete=True)
 
 def callback_12(bot, job):
-   print('Starting automatic broadcast 12')
+   LG.info('Starting automatic 12:00 broadcast')
    to_send = []
    for f in files:
       h = f.split('.')[-2]
@@ -107,7 +108,7 @@ def callback_12(bot, job):
          send_picture(bot, chatID, J, f, msg=txt, t=3600, delete=True)
 
 def callback_18(bot, job):
-   print('Starting automatic broadcast 18')
+   LG.info('Starting automatic 18:00 broadcast')
    to_send = []
    for f in files:
       h = f.split('.')[-2]
@@ -138,6 +139,7 @@ D.add_handler(CommandHandler('stop', stop))
 # Hola
 import tool
 D.add_handler(CommandHandler('fcst', tool.fcst, pass_args=True, pass_job_queue=True))
+D.add_handler(CommandHandler('sounding', tool.sounding, pass_args=True, pass_job_queue=True))
 
 
 #J.run_daily(callback_8,  dt.time(7, 30))
