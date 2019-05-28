@@ -89,11 +89,10 @@ def sounding(bot,update,job_queue,args):
 
 
 ## Auxiliary ###################################################################
-from randmo import choice
-def hola(bot, update, job_queue):
+from random import choice
+def hola(bot, update):
    """ echo-like service to check system status """
    chatID = update.message.chat_id
    salu2 = ['What\'s up?', 'Oh, hi there!', 'How you doin\'?', 'Hello!']
    txt = choice(salu2)
-   M = bot.send_message(chatID, text=txt,
-                        parse_mode='Markdown')
+   M = bot.send_message(chatID, text=txt, parse_mode='Markdown')
