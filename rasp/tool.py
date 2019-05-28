@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
-from telegram import ChatAction
+from telegram import ChatAction, ParseMode
 import datetime as dt
 import os
 HOME = os.getenv('HOME')
@@ -25,7 +25,8 @@ def send_picture(bot, chatID, job_queue, pic, msg='',
    else: photo = open(pic, 'rb')  # TODO raise and report if file not found
    bot.send_chat_action(chat_id=chatID, action=ChatAction.UPLOAD_PHOTO)
    M = bot.send_photo(chatID, photo, caption=msg,
-                                  timeout=300, disable_notification=dis_notif)
+                              timeout=300, disable_notification=dis_notif,
+                              parse_mode=ParseMode.MARKDOWN)
    if delete: job_queue.run_once(call_delete, t, context=M)
 
 
@@ -79,7 +80,7 @@ def sounding(bot,update,job_queue,args):
       return
    f = HOME + '/Documents/RASP/SC2/FCST/' + date.strftime('%d_%m_%Y_%H_%M')
    f += '.sounding%s.w2.png'%(index)
-   txt = 'Sounding for %s at %s'%(place, date.strftime('%d/%m/%Y-%H:%M'))
+   txt = "Sounding _for_ %s at %s"%(place, date.strftime('%d/%m/%Y-%H:%M'))
    fol,_ = locate(date,'')
    H = date.strftime('%H%M')
    url_picture = f'http://raspuri.mooo.com/RASP/'
