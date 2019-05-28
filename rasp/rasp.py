@@ -70,7 +70,7 @@ def broadcast(bot, job):
       txt += 'For more information go to:\n'
       txt += ' http://raspuri.mooo.com/RASP/index.php'
       tool.send_picture(bot, Bcast_chatID, J, f, msg=txt,
-                                            t=3600, delete=True, dis_notif=True)
+                                          t=5*3600, delete=True, dis_notif=True)
 
 
 # Start Bot
