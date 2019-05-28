@@ -87,6 +87,8 @@ D.add_handler(CommandHandler('start', start))
 D.add_handler(CommandHandler('reload', restart))
 # Stop
 D.add_handler(CommandHandler('stop', stop))
+# Hola
+D.add_handler(CommandHandler('hola', tool.hola))
 # Forecast
 D.add_handler(CommandHandler('fcst', tool.fcst, pass_args=True, pass_job_queue=True))
 # Sounding
