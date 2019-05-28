@@ -65,7 +65,7 @@ def broadcast(bot, job):
    for h in hours:
       d = dt.datetime.combine(tday, dt.time(h, 0))
       LG.info('Broadcasting forecast for '+d.strftime('%H:%M'))
-      f = tool.locate(d, 'sfcwind')
+      _,f = tool.locate(d, 'sfcwind')
       txt = 'Surface wind at *%s*\n'%(d.strftime('%H:%M'))
       txt += 'For more information go to:\n'
       txt += ' http://raspuri.mooo.com/RASP/index.php'
