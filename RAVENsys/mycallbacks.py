@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
+from telegram import ChatAction
 from threading import Thread
 from random import choice
 import tools
@@ -49,6 +50,7 @@ def screenshot(bot,update,job_queue):
    os.system(com)
    txt = 'Please be patient, this usually takes a few seconds'
    M = bot.send_message(chatID, text=txt,parse_mode='Markdown')
+   bot.send_chat_action(chat_id=chatID, action=ChatAction.UPLOAD_PHOTO)
    send_picture(bot,chatID,job_queue,pic,msg='Here it is the screenshot',t=10)
    bot.delete_message(chatID,M['message_id'])
 

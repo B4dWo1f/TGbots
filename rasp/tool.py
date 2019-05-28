@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
+from telegram import ChatAction
 import datetime as dt
 import os
 HOME = os.getenv('HOME')
@@ -33,6 +34,7 @@ def fcst(bot,update,job_queue,args):
    for d in dates:
       _,f = locate(d, 'sfcwind')
       txt = 'Surface wind for %s'%(d.strftime('%d/%m/%Y-%H:%M'))
+      bot.send_chat_action(chat_id=chatID, action=ChatAction.UPLOAD_PHOTO)
       send_picture(bot, chatID, job_queue, f, msg=txt, t=30,delete=True)
 
 def locate(date,prop):
