@@ -19,9 +19,6 @@ logging.basicConfig(level=logging.INFO,
 
 LG = logging.getLogger('main')
 
-Bcast_chatID = '-230660894'   # grupo
-Bcast_chatID = '3875655'      # private
-
 
 def start(bot, update):
    txt = "I'm a bot, please talk to me!"
@@ -77,7 +74,8 @@ def broadcast(bot, job):
 
 
 # Start Bot
-token = CR.get_credentials('rasp.token')
+token, Bcast_chatID = CR.get_credentials('rasp.token')
+
 U = Updater(token=token)
 D = U.dispatcher
 J = U.job_queue

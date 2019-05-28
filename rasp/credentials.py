@@ -13,8 +13,8 @@ LIST_OF_ADMINS_id = [int(x) for x in LIST_OF_ADMINS_id]
 def get_credentials(api_file=here+'/telegram_bot.private'):
    api_key = open(api_file,'r').read().strip().splitlines()
    bot_token = decode(api_key[0]).decode('utf-8')
-   #bot_chatID = decode(api_key[1]).decode('utf-8')
-   return bot_token #, bot_chatID
+   bot_chatID = decode(api_key[1]).decode('utf-8')
+   return bot_token, bot_chatID
 
 
 def restricted(func):
