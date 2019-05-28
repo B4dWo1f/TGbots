@@ -17,7 +17,8 @@ def call_delete(bot, job):
    msgID = job.context['message_id']
    bot.delete_message(chatID,msgID)
 
-def send_picture(bot,chatID,job_queue,pic,msg='',t=10,rm=True,delete=True):
+def send_picture(bot, chatID, job_queue, pic, msg='',
+                                    t=60,rm=False,delete=True,dis_notif=False):
    """
      Send a picture and, optionally, remove it locally/remotely (rm/delete)
      msg = caption of the picture
@@ -25,10 +26,15 @@ def send_picture(bot,chatID,job_queue,pic,msg='',t=10,rm=True,delete=True):
      rm = remove local file
      delete = remove remote file
    """
-   photo = open(pic, 'rb')
-   M = bot.send_photo(chatID, photo, caption=msg,timeout=50)
+   if pic[:4] == 'http': photo = pic
+   else: photo = open(pic, 'rb')  # TODO raise and report if file not found
+   bot.send_chat_action(chat_id=chatID, action=ChatAction.UPLOAD_PHOTO)
+   M = bot.send_photo(chatID, photo, caption=msg,
+                                  timeout=300, disable_notification=dis_notif)
    if rm: os.system('rm %s'%(pic))
    if delete: job_queue.run_once(call_delete, t, context=M)
+
+
 
 def send_sound(bot,chatID,job_queue,audio,msg='',t=10,rm=True,delete=True):
    mp3 = open(audio, 'rb')

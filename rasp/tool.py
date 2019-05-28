@@ -13,8 +13,17 @@ def call_delete(bot, job):
 
 def send_picture(bot, chatID, job_queue, pic, msg='',
                  t=60,delete=True,dis_notif=False):
+   """
+    Send a picture and, optionally, remove it locally/remotely (rm/delete)
+    pic = photo to send
+    msg = caption of the picture
+    t = time to wait to delete the remote picture
+    delete = remove remote file t seconds after sending
+    dis_notif = Disable sound notification
+   """
    if pic[:4] == 'http': photo = pic
    else: photo = open(pic, 'rb')  # TODO raise and report if file not found
+   bot.send_chat_action(chat_id=chatID, action=ChatAction.UPLOAD_PHOTO)
    M = bot.send_photo(chatID, photo, caption=msg,
                                   timeout=300, disable_notification=dis_notif)
    if delete: job_queue.run_once(call_delete, t, context=M)
@@ -34,7 +43,6 @@ def fcst(bot,update,job_queue,args):
    for d in dates:
       _,f = locate(d, 'sfcwind')
       txt = 'Surface wind for %s'%(d.strftime('%d/%m/%Y-%H:%M'))
-      bot.send_chat_action(chat_id=chatID, action=ChatAction.UPLOAD_PHOTO)
       send_picture(bot, chatID, job_queue, f, msg=txt, t=30,delete=True)
 
 def locate(date,prop):
