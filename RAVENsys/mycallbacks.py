@@ -38,6 +38,7 @@ def send_picture(bot, chatID, job_queue, pic, msg='',
 
 def send_sound(bot,chatID,job_queue,audio,msg='',t=10,rm=True,delete=True):
    mp3 = open(audio, 'rb')
+   bot.send_chat_action(chat_id=chatID, action=ChatAction.UPLOAD_AUDIO)
    bot.send_audio(chatID, mp3, caption=msg,timeout=50)
    if rm: os.system('rm %s'%(audio))
    if delete: job_queue.run_once(call_delete, t, context=M)
@@ -56,7 +57,6 @@ def screenshot(bot,update,job_queue):
    os.system(com)
    txt = 'Please be patient, this usually takes a few seconds'
    M = bot.send_message(chatID, text=txt,parse_mode='Markdown')
-   bot.send_chat_action(chat_id=chatID, action=ChatAction.UPLOAD_PHOTO)
    send_picture(bot,chatID,job_queue,pic,msg='Here it is the screenshot',t=10)
    bot.delete_message(chatID,M['message_id'])
 
@@ -93,6 +93,7 @@ def sound(bot,update):
 def whereRyou(bot,update):
    """ Return the IP where the bot is running """
    chatID = update.message.chat_id
+   bot.send_chat_action(chat_id=chatID, action=ChatAction.TYPING)
    ip = tools.get_public_IP()
    txt = ''
    for l in str(geoip.analyze_IP(ip)).splitlines():
@@ -104,6 +105,7 @@ def whoSthere(bot,update):
    chatID = update.message.chat_id
    txt = 'Hold on, it might take a second'
    bot.send_message(chatID, text=txt,parse_mode='Markdown')
+   bot.send_chat_action(chat_id=chatID, action=ChatAction.TYPING)
    txt = ''
    for d in check.check_network():
       l = ''
