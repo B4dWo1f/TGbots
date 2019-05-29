@@ -3,6 +3,7 @@
 
 from telegram import ChatAction, ParseMode
 import datetime as dt
+import re
 import os
 HOME = os.getenv('HOME')
 
@@ -30,21 +31,28 @@ def send_picture(bot, chatID, job_queue, pic, msg='',
    if delete: job_queue.run_once(call_delete, t, context=M)
 
 
-def fcst(bot,update,job_queue,args):
-   """ echo-like service to check system status """
-   chatID = update.message.chat_id
-   dates = [dt.datetime.strptime(d,'%d/%m/%Y-%H:%M') for d in args]
-   try: dates = [dt.datetime.strptime(d,'%d/%m/%Y-%H:%M') for d in args]
-   except ValueError:
-      txt = 'Sorry, I didn\'t understand\n'
-      txt += 'Usage: /fcst %d/%m/%Y-%H:%M\n'
-      txt += 'ex: /fcst 18/05/2019-13:00'
-      bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
-      return
-   for d in dates:
-      _,f = locate(d, 'sfcwind')
-      txt = 'Surface wind for %s'%(d.strftime('%d/%m/%Y-%H:%M'))
-      send_picture(bot, chatID, job_queue, f, msg=txt, t=30,delete=True)
+def parse_date(date):
+   try:
+      pattern = r'([ ^\W\w\d_ ]*) (\S+)'
+      match = re.search(pattern, date)
+      day,time = match.groups()
+      try:
+         pattern = r'(\S+):(\S+)'
+         match = re.search(pattern, time)
+         h,m = (match.groups())
+         m = 0
+      except AttributeError:
+         h = time
+         m = 0
+      h = int(h)
+      m = int(m)
+      shifts = {'hoy':0, 'mañana':1, 'pasado':2, 'al otro':3}
+      delta = dt.timedelta(days=shifts[day])
+      now = dt.datetime.now()
+      date = now+delta
+      return date.replace(hour=h, minute=m, second=0, microsecond=0)
+   except: raise
+
 
 def locate(date,prop):
    UTCshift = dt.datetime.now()-dt.datetime.utcnow()
@@ -62,17 +70,41 @@ def locate(date,prop):
    return fol,fname
 
 
+def fcst(bot,update,job_queue,args):
+   """ echo-like service to check system status """
+   chatID = update.message.chat_id
+   d = ' '.join(args)
+   #dates = [dt.datetime.strptime(d,'%d/%m/%Y-%H:%M') for d in args]
+   try: date = dt.datetime.strptime(d,'%d/%m/%Y-%H:%M')
+   except ValueError: date = parse_date(d)
+   except:
+      txt = 'Sorry, I didn\'t understand\n'
+      txt += 'Usage: /fcst %d/%m/%Y-%H:%M\n'
+      txt += '       /fcst [hoy/mañana/pasado/al otro] %H\n'
+      txt += '       /fcst [hoy/mañana/pasado/al otro] %H:%M\n'
+      txt += 'ex: /fcst 18/05/2019-13:00\n'
+      txt += '    /fcst mañana 13:00\n'
+      txt += '    /fcst al otro 14'
+      bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
+      return
+   _,f = locate(date, 'sfcwind')
+   txt = 'Surface wind for %s'%(date.strftime('%d/%m/%Y-%H:%M'))
+   send_picture(bot, chatID, job_queue, f, msg=txt, t=30,delete=True)
+
+
 def sounding(bot,update,job_queue,args):
    """ echo-like service to check system status """
    places = {'arcones': 1, 'bustarviejo': 2, 'cebreros': 3, 'abantos': 4,
              'piedrahita': 5, 'pedro bernardo': 6, 'lillo': 7,
              'fuentemilanos': 8, 'candelario': 10, 'pitolero': 11,
              'pegalajar': 12, 'otivar': 13}
-   place, date = args
+   place = args[0]
+   date = ' '.join(args[1:])
    index = places[place]
    chatID = update.message.chat_id
    try: date = dt.datetime.strptime(date,'%d/%m/%Y-%H:%M')
-   except ValueError:
+   except ValueError: date = parse_date(date)
+   except:
       txt = 'Sorry, I didn\'t understand\n'
       txt += 'Usage: /sounding {place} %d/%m/%Y-%H:%M\n'
       txt += 'ex: /sounding Arcones 18/05/2019-13:00'
