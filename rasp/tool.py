@@ -100,7 +100,7 @@ def sounding(bot,update,job_queue,args):
              'pegalajar': 12, 'otivar': 13}
    place = args[0]
    date = ' '.join(args[1:])
-   index = places[place]
+   index = places[place.lower()]
    chatID = update.message.chat_id
    try: date = dt.datetime.strptime(date,'%d/%m/%Y-%H:%M')
    except ValueError: date = parse_date(date)
@@ -110,9 +110,7 @@ def sounding(bot,update,job_queue,args):
       txt += 'ex: /sounding Arcones 18/05/2019-13:00'
       bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
       return
-   fmt = '%d_%m_%Y_%H_%M'
-   #f = HOME + '/Documents/RASP/SC2/FCST/' + date.strftime('%d_%m_%Y_%H_%M')
-   #f += '.sounding%s.w2.png'%(index)
+   fmt = '%d/%m/%Y-%H:%M'
    txt = "Sounding for *%s* at *%s*"%(place.capitalize(), date.strftime(fmt))
    fol,_ = locate(date,'')
    H = date.strftime('%H%M')
