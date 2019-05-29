@@ -95,7 +95,7 @@ D.add_handler(CommandHandler('fcst', tool.fcst, pass_args=True, pass_job_queue=T
 D.add_handler(CommandHandler('sounding', tool.sounding, pass_args=True, pass_job_queue=True))
 
 
-J.run_daily(broadcast, dt.time(7,30))
+J.run_daily(broadcast, dt.time(7,55))
 J.run_daily(broadcast, dt.time(12,45))
 J.run_daily(broadcast, dt.time(18,15))
 
