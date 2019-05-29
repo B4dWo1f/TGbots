@@ -112,7 +112,7 @@ def sounding(bot,update,job_queue,args):
       return
    f = HOME + '/Documents/RASP/SC2/FCST/' + date.strftime('%d_%m_%Y_%H_%M')
    f += '.sounding%s.w2.png'%(index)
-   txt = "Sounding _for_ %s at %s"%(place, date.strftime('%d/%m/%Y-%H:%M'))
+   txt = "Sounding for *%s* at *%s*"%(place, date.strftime('%d/%m/%Y-%H:%M'))
    fol,_ = locate(date,'')
    H = date.strftime('%H%M')
    url_picture = f'http://raspuri.mooo.com/RASP/'
