@@ -51,7 +51,7 @@ def parse_date(date):
       now = dt.datetime.now()
       date = now+delta
       return date.replace(hour=h, minute=m, second=0, microsecond=0)
-   except: raise
+   except AttributeError: return None
 
 
 def locate(date,prop):
@@ -77,7 +77,8 @@ def fcst(bot,update,job_queue,args):
    #dates = [dt.datetime.strptime(d,'%d/%m/%Y-%H:%M') for d in args]
    try: date = dt.datetime.strptime(d,'%d/%m/%Y-%H:%M')
    except ValueError: date = parse_date(d)
-   except:
+   print('***',date)
+   if date == None:
       txt = 'Sorry, I didn\'t understand\n'
       txt += 'Usage: /fcst %d/%m/%Y-%H:%M\n'
       txt += '       /fcst [hoy/mañana/pasado/al otro] %H\n'
@@ -98,16 +99,20 @@ def sounding(bot,update,job_queue,args):
              'piedrahita': 5, 'pedro bernardo': 6, 'lillo': 7,
              'fuentemilanos': 8, 'candelario': 10, 'pitolero': 11,
              'pegalajar': 12, 'otivar': 13}
-   place = args[0]
-   date = ' '.join(args[1:])
+   place = ' '.join(args[:-2])
+   date = ' '.join(args[-2:])
    index = places[place.lower()]
    chatID = update.message.chat_id
    try: date = dt.datetime.strptime(date,'%d/%m/%Y-%H:%M')
    except ValueError: date = parse_date(date)
-   except:
+   if date == None:
       txt = 'Sorry, I didn\'t understand\n'
       txt += 'Usage: /sounding {place} %d/%m/%Y-%H:%M\n'
-      txt += 'ex: /sounding Arcones 18/05/2019-13:00'
+      txt += '       /sounding {place} [hoy/mañana/pasado/al otro] %H\n'
+      txt += '       /sounding {place} [hoy/mañana/pasado/al otro] %H:%M\n'
+      txt += 'ex: /sounding Arcones 18/05/2019-13:00\n'
+      txt += '    /sounding cebreros mañana 13:00\n'
+      txt += '    /sounding piedrahita al otro 17:00'
       bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
       return
    fmt = '%d/%m/%Y-%H:%M'
