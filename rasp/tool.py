@@ -31,25 +31,47 @@ def send_picture(bot, chatID, job_queue, pic, msg='',
    if delete: job_queue.run_once(call_delete, t, context=M)
 
 
-def parse_date(date):
+def parse_time(time):
    try:
+      pattern = r'(\S+):(\S+)'
+      match = re.search(pattern, time)
+      h,m = (match.groups())
+      m = 0
+   except AttributeError:
+      h = time
+      m = 0
+   return int(h), int(m)
+
+
+def parser_date(line):
+   numday = {0: 'lunes', 1: 'martes', 2: 'miércoles', 3: 'jueves', 4: 'viernes',
+               5: 'sábado', 6: 'domingo'}
+   daynum = {'lunes':0, 'martes':1, 'miércoles':2, 'jueves':3, 'viernes':4,
+             'sábado':5, 'domingo':6}
+   shifts = {'hoy':0, 'mañana':1, 'pasado':2, 'al otro':3}
+
+   fmt = '%d/%m/%Y-%H:%M'
+   try: return dt.datetime.strptime(line, fmt)
+   except ValueError:
       pattern = r'([ ^\W\w\d_ ]*) (\S+)'
-      match = re.search(pattern, date)
-      day,time = match.groups()
-      try:
-         pattern = r'(\S+):(\S+)'
-         match = re.search(pattern, time)
-         h,m = (match.groups())
-         m = 0
-      except AttributeError:
-         h = time
-         m = 0
-      h = int(h)
-      m = int(m)
-      shifts = {'hoy':0, 'mañana':1, 'pasado':2, 'al otro':3}
-      delta = dt.timedelta(days=shifts[day])
-      now = dt.datetime.now()
-      date = now+delta
+      match = re.search(pattern, line)
+      date,time = match.groups()
+      h,m = parse_time(time)
+      if date in daynum.keys(): ###############################  Using weekdays
+         qday = daynum[date]
+         now = dt.datetime.now()
+         day = dt.timedelta(days=1)
+         wds = []
+         for i in range(7):
+            d = (now + i*day).weekday()
+            if d==qday: break
+         date = now + i*day
+      else: ##############################################  Using relative days
+         shifts = {'hoy':0, 'mañana':1, 'pasado':2, 'pasado mañana':2,
+                   'al otro':3}
+         delta = dt.timedelta(days=shifts[date])
+         now = dt.datetime.now()
+         date = now+delta
       return date.replace(hour=h, minute=m, second=0, microsecond=0)
    except: raise
 
@@ -63,7 +85,7 @@ def locate(date,prop):
    elif utcdate.date() == now.date()+day: fol = 'SC2+1'
    elif utcdate.date() == now.date()+2*day: fol = 'SC4+2'
    elif utcdate.date() == now.date()+3*day: fol = 'SC4+3'
-   else: raise
+   else: return None,None
    fname  = HOME+'/Documents/RASP/PLOTS/w2/%s/'%(fol)
    fname += utcdate.strftime('%Y/%m/%d/%H00')
    fname += '_%s.jpg'%(prop)
@@ -74,9 +96,7 @@ def fcst(bot,update,job_queue,args):
    """ echo-like service to check system status """
    chatID = update.message.chat_id
    d = ' '.join(args)
-   #dates = [dt.datetime.strptime(d,'%d/%m/%Y-%H:%M') for d in args]
-   try: date = dt.datetime.strptime(d,'%d/%m/%Y-%H:%M')
-   except ValueError: date = parse_date(d)
+   try: date = parser_date(d)
    except:
       txt = 'Sorry, I didn\'t understand\n'
       txt += 'Usage: /fcst %d/%m/%Y-%H:%M\n'
@@ -88,22 +108,25 @@ def fcst(bot,update,job_queue,args):
       bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
       return
    _,f = locate(date, 'sfcwind')
+   if f == None:
+      txt = 'Sorry, forecast not available'
+      bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
+      return
    txt = 'Surface wind for %s'%(date.strftime('%d/%m/%Y-%H:%M'))
    send_picture(bot, chatID, job_queue, f, msg=txt, t=30,delete=True)
 
 
 def sounding(bot,update,job_queue,args):
    """ echo-like service to check system status """
+   chatID = update.message.chat_id
    places = {'arcones': 1, 'bustarviejo': 2, 'cebreros': 3, 'abantos': 4,
              'piedrahita': 5, 'pedro bernardo': 6, 'lillo': 7,
              'fuentemilanos': 8, 'candelario': 10, 'pitolero': 11,
              'pegalajar': 12, 'otivar': 13}
    place = args[0]
-   date = ' '.join(args[1:])
    index = places[place]
-   chatID = update.message.chat_id
-   try: date = dt.datetime.strptime(date,'%d/%m/%Y-%H:%M')
-   except ValueError: date = parse_date(date)
+   date = ' '.join(args[1:])
+   try: date = parser_date(date)
    except:
       txt = 'Sorry, I didn\'t understand\n'
       txt += 'Usage: /sounding {place} %d/%m/%Y-%H:%M\n'
@@ -111,8 +134,6 @@ def sounding(bot,update,job_queue,args):
       bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
       return
    fmt = '%d_%m_%Y_%H_%M'
-   #f = HOME + '/Documents/RASP/SC2/FCST/' + date.strftime('%d_%m_%Y_%H_%M')
-   #f += '.sounding%s.w2.png'%(index)
    txt = "Sounding for *%s* at *%s*"%(place.capitalize(), date.strftime(fmt))
    fol,_ = locate(date,'')
    H = date.strftime('%H%M')
