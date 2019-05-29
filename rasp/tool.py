@@ -77,15 +77,14 @@ def fcst(bot,update,job_queue,args):
    #dates = [dt.datetime.strptime(d,'%d/%m/%Y-%H:%M') for d in args]
    try: date = dt.datetime.strptime(d,'%d/%m/%Y-%H:%M')
    except ValueError: date = parse_date(d)
-   print('***',date)
    if date == None:
       txt = 'Sorry, I didn\'t understand\n'
       txt += 'Usage: /fcst %d/%m/%Y-%H:%M\n'
-      txt += '       /fcst [hoy/mañana/pasado/al otro] %H\n'
-      txt += '       /fcst [hoy/mañana/pasado/al otro] %H:%M\n'
+      txt += '        /fcst [hoy/mañana/pasado/al otro] %H\n'
+      txt += '        /fcst [hoy/mañana/pasado/al otro] %H:%M\n'
       txt += 'ex: /fcst 18/05/2019-13:00\n'
-      txt += '    /fcst mañana 13:00\n'
-      txt += '    /fcst al otro 14'
+      txt += '     /fcst mañana 13:00\n'
+      txt += '     /fcst al otro 14'
       bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
       return
    _,f = locate(date, 'sfcwind')
@@ -108,11 +107,11 @@ def sounding(bot,update,job_queue,args):
    if date == None:
       txt = 'Sorry, I didn\'t understand\n'
       txt += 'Usage: /sounding {place} %d/%m/%Y-%H:%M\n'
-      txt += '       /sounding {place} [hoy/mañana/pasado/al otro] %H\n'
-      txt += '       /sounding {place} [hoy/mañana/pasado/al otro] %H:%M\n'
+      txt += '        /sounding {place} [hoy/mañana/pasado/al otro] %H\n'
+      txt += '        /sounding {place} [hoy/mañana/pasado/al otro] %H:%M\n'
       txt += 'ex: /sounding Arcones 18/05/2019-13:00\n'
-      txt += '    /sounding cebreros mañana 13:00\n'
-      txt += '    /sounding piedrahita al otro 17:00'
+      txt += '     /sounding cebreros mañana 13:00\n'
+      txt += '     /sounding piedrahita al otro 17:00'
       bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
       return
    fmt = '%d/%m/%Y-%H:%M'
