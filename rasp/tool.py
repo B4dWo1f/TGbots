@@ -123,9 +123,9 @@ def sounding(bot,update,job_queue,args):
              'piedrahita': 5, 'pedro bernardo': 6, 'lillo': 7,
              'fuentemilanos': 8, 'candelario': 10, 'pitolero': 11,
              'pegalajar': 12, 'otivar': 13}
-   place = args[0]
+   place = ' '.join(args[:-2])
    index = places[place]
-   date = ' '.join(args[1:])
+   date = ' '.join(args[-2:])
    try: date = parser_date(date)
    except:
       txt = 'Sorry, I didn\'t understand\n'
