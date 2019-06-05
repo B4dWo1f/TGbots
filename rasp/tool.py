@@ -44,10 +44,10 @@ def parse_time(time):
 
 
 def parser_date(line):
-   numday = {0: 'lunes', 1: 'martes', 2: 'miércoles', 3: 'jueves', 4: 'viernes',
-               5: 'sábado', 6: 'domingo'}
-   daynum = {'lunes':0, 'martes':1, 'miércoles':2, 'jueves':3, 'viernes':4,
-             'sábado':5, 'domingo':6}
+   numday = {0: 'lunes', 1: 'martes', 2: 'miércoles', 3: 'jueves',
+             4: 'viernes', 5: 'sábado', 6: 'domingo'}
+   daynum = {'lunes':0, 'martes':1, 'miercoles':2, 'miércoles':2, 'jueves':3,
+             'viernes':4, 'sabado':5, 'sábado':5, 'domingo':6}
    shifts = {'hoy':0, 'mañana':1, 'pasado':2, 'al otro':3}
 
    fmt = '%d/%m/%Y-%H:%M'
