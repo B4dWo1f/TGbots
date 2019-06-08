@@ -113,7 +113,7 @@ def fcst(bot,update,job_queue,args):
       bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
       return
    txt = 'Surface wind for %s'%(date.strftime('%d/%m/%Y-%H:%M'))
-   send_picture(bot, chatID, job_queue, f, msg=txt, t=30,delete=True)
+   send_picture(bot, chatID, job_queue, f, msg=txt, t=180,delete=True)
 
 
 def sounding(bot,update,job_queue,args):
@@ -139,7 +139,7 @@ def sounding(bot,update,job_queue,args):
    H = date.strftime('%H%M')
    url_picture = f'http://raspuri.mooo.com/RASP/'
    url_picture += f'{fol}/FCST/sounding{index}.curr.{H}lst.w2.png'
-   send_picture(bot, chatID, job_queue, url_picture, msg=txt, t=30,delete=True)
+   send_picture(bot, chatID, job_queue, url_picture, msg=txt, t=180,delete=True)
 
 
 ## Auxiliary ###################################################################
