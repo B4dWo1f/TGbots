@@ -4,8 +4,10 @@
 from telegram import ChatAction, ParseMode
 import datetime as dt
 import re
+import logging
 import os
 HOME = os.getenv('HOME')
+LG = logging.getLogger(__name__)
 
 def call_delete(bot, job):
    chatID = job.context['chat']['id']
@@ -22,13 +24,16 @@ def send_picture(bot, chatID, job_queue, pic, msg='',
     delete = remove remote file t seconds after sending
     dis_notif = Disable sound notification
    """
+   LG.info('Sending picture: %s'%(pic))
    if pic[:4] == 'http': photo = pic
    else: photo = open(pic, 'rb')  # TODO raise and report if file not found
    bot.send_chat_action(chat_id=chatID, action=ChatAction.UPLOAD_PHOTO)
    M = bot.send_photo(chatID, photo, caption=msg,
                               timeout=300, disable_notification=dis_notif,
                               parse_mode=ParseMode.MARKDOWN)
-   if delete: job_queue.run_once(call_delete, t, context=M)
+   if delete:
+      LG.debug('pic %s to be deleted at %s'%(pic,dt.datetime.now()+dt.timedelta(seconds=t)))
+      job_queue.run_once(call_delete, t, context=M)
 
 
 def parse_time(time):
@@ -94,6 +99,7 @@ def locate(date,prop):
 
 def fcst(bot,update,job_queue,args):
    """ echo-like service to check system status """
+   LG.info('received request: %s'%(update.message.text))
    chatID = update.message.chat_id
    d = ' '.join(args)
    try: date = parser_date(d)
@@ -118,13 +124,14 @@ def fcst(bot,update,job_queue,args):
 
 def sounding(bot,update,job_queue,args):
    """ echo-like service to check system status """
+   LG.info('received request: %s'%(update.message.text))
    chatID = update.message.chat_id
    places = {'arcones': 1, 'bustarviejo': 2, 'cebreros': 3, 'abantos': 4,
              'piedrahita': 5, 'pedro bernardo': 6, 'lillo': 7,
              'fuentemilanos': 8, 'candelario': 10, 'pitolero': 11,
              'pegalajar': 12, 'otivar': 13}
    place = ' '.join(args[:-2])
-   index = places[place]
+   index = places[place.lower()]
    date = ' '.join(args[-2:])
    try: date = parser_date(date)
    except:
@@ -146,6 +153,7 @@ def sounding(bot,update,job_queue,args):
 from random import choice
 def hola(bot, update):
    """ echo-like service to check system status """
+   LG.info('Hola!')
    chatID = update.message.chat_id
    salu2 = ['What\'s up?', 'Oh, hi there!', 'How you doin\'?', 'Hello!']
    txt = choice(salu2)
