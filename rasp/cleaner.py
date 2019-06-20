@@ -5,9 +5,11 @@
  This script should keep the pics_ids.txt file clean
 """
 
+import os
 import datetime as dt
+here = os.path.dirname(os.path.realpath(__file__))
 
-fname = 'pics_ids.txt'
+fname = here + '/pics_ids.txt'
 
 all_lines = open(fname,'r').read().strip().splitlines()
 
