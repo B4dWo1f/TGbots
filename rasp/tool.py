@@ -8,6 +8,7 @@ import logging
 import os
 HOME = os.getenv('HOME')
 LG = logging.getLogger(__name__)
+f_id_files = 'pics_ids.txt'
 
 def call_delete(bot, job):
    chatID = job.context['chat']['id']
@@ -26,7 +27,9 @@ def send_picture(bot, chatID, job_queue, pic, msg='',
    """
    LG.info('Sending picture: %s'%(pic))
    if pic[:4] == 'http': photo = pic
-   else: photo = open(pic, 'rb')  # TODO raise and report if file not found
+   else:
+      try: photo = open(pic, 'rb')  # TODO raise and report if file not found
+      except: photo = pic
    bot.send_chat_action(chat_id=chatID, action=ChatAction.UPLOAD_PHOTO)
    M = bot.send_photo(chatID, photo, caption=msg,
                               timeout=300, disable_notification=dis_notif,
@@ -34,6 +37,7 @@ def send_picture(bot, chatID, job_queue, pic, msg='',
    if delete:
       LG.debug('pic %s to be deleted at %s'%(pic,dt.datetime.now()+dt.timedelta(seconds=t)))
       job_queue.run_once(call_delete, t, context=M)
+   return M
 
 
 def parse_time(time):
@@ -120,7 +124,15 @@ def fcst(bot,update,job_queue,args):
       bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
       return
    txt = 'Surface wind for %s'%(date.strftime('%d/%m/%Y-%H:%M'))
-   send_picture(bot, chatID, job_queue, f, msg=txt, t=180,delete=True)
+   try:
+      f = os.popen("grep %s %s"%(f, f_id_files)).read().strip().split()[-1]
+   except: pass
+   M = send_picture(bot, chatID, job_queue, f, msg=txt, t=180,delete=True)
+   f_ID = M['photo'][-1]['file_id']
+   if f[0] == '/':   # means that f is the abs path of the file
+      with open(f_id_files,'a') as fw:
+         fw.write(str(f)+'   '+str(f_ID)+'\n')
+      fw.close()
 
 
 def sounding(bot,update,job_queue,args):

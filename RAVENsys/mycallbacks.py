@@ -33,6 +33,7 @@ def send_picture(bot, chatID, job_queue, pic, msg='',
                                   timeout=300, disable_notification=dis_notif)
    if rm: os.system('rm %s'%(pic))
    if delete: job_queue.run_once(call_delete, t, context=M)
+   return M
 
 
 
