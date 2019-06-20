@@ -61,6 +61,7 @@ def parser_date(line):
       pattern = r'([ ^\W\w\d_ ]*) (\S+)'
       match = re.search(pattern, line)
       date,time = match.groups()
+      date = date.lower()
       h,m = parse_time(time)
       if date in daynum.keys(): ###############################  Using weekdays
          qday = daynum[date]
