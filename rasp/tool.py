@@ -74,7 +74,7 @@ def parser_date(line):
       else: ##############################################  Using relative days
          shifts = {'hoy':0, 'mañana':1, 'pasado':2, 'pasado mañana':2,
                    'al otro':3}
-         delta = dt.timedelta(days=shifts[date])
+         delta = dt.timedelta(days=shifts[date.lower()])
          now = dt.datetime.now()
          date = now+delta
       return date.replace(hour=h, minute=m, second=0, microsecond=0)
