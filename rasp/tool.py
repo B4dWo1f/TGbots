@@ -5,6 +5,7 @@ from telegram import ChatAction, ParseMode
 import string
 from urllib.request import urlretrieve
 import datetime as dt
+import aemet
 import re
 import logging
 import os
@@ -170,6 +171,40 @@ def sounding(bot,update,job_queue,args):
    urlretrieve(url_picture, f_tmp)
    send_picture(bot, chatID, job_queue, f_tmp, msg=txt, t=60,delete=True)
    os.system(f'rm {f_tmp}')
+
+def tormentas(bot,update,job_queue,args):
+   chatID = update.message.chat_id
+   def usage():
+      txt = 'Available places:\n'
+      txt += ' - Guadarrama, Somosierra, Gredos\n'
+      txt += '(case insensitive)\n'
+      txt += 'Available dates:\n'
+      txt += ' - hoy, mañana, pasado, al otro, al siguiente\n'
+      txt += 'Ex: /tormentas gredos mañana\n'
+      txt += '      /tormentas Guadarrama al otro\n'
+      txt += '      /tormentas somosierra hoy\n'
+      M = bot.send_message(chatID, text=txt, parse_mode='Markdown')
+   names = {'picos de europa': 'peu1',
+            'pirineo navarro': 'nav1',
+            'pirineo aragones': 'arn1',
+            'pirineo catalan': 'cat1',
+            'iberica riojana': 'rio1',
+            'sierra de gredos': 'gre1', 'gredos': 'gre1',
+            'guadarrama': 'mad2', 'somosierra': 'mad2',
+            'iberica aragonesa': 'arn2',
+            'sierra nevada': 'nev1'}
+   dates = {'hoy':2, 'mañana':3, 'pasado':4, 'al otro':5, 'al siguiente':6}
+
+   if len(args) == 0:
+      usage()
+      return
+   place = args[0].strip()
+   place = names[place]
+   date = ' '.join(args[1:])
+   w = dates[date]
+   url = f'http://www.aemet.es/es/eltiempo/prediccion/montana?w={w}&p={place}'
+   txt = str(aemet.parse_parte_aemet(url))
+   M = bot.send_message(chatID, text=txt, parse_mode='Markdown')
 
 
 ## Auxiliary ###################################################################

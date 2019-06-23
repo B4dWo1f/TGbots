@@ -93,6 +93,8 @@ D.add_handler(CommandHandler('hola', tool.hola))
 D.add_handler(CommandHandler('fcst', tool.fcst, pass_args=True, pass_job_queue=True))
 # Sounding
 D.add_handler(CommandHandler('sounding', tool.sounding, pass_args=True, pass_job_queue=True))
+# Tormentas
+D.add_handler(CommandHandler('tormentas', tool.tormentas, pass_args=True, pass_job_queue=True))
 
 
 J.run_daily(broadcast, dt.time(7,55))
