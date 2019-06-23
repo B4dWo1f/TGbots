@@ -2,6 +2,8 @@
 # -*- coding: UTF-8 -*-
 
 from telegram import ChatAction, ParseMode
+import string
+from urllib.request import urlretrieve
 import datetime as dt
 import re
 import logging
@@ -39,6 +41,11 @@ def send_picture(bot, chatID, job_queue, pic, msg='',
       job_queue.run_once(call_delete, t, context=M)
    return M
 
+def rand_name(pwdSize=8):
+   """ Generates a random string of letters and digits with pwdSize length """
+   ## all possible letters and numbers
+   chars = string.ascii_letters + string.digits
+   return ''.join((choice(chars)) for x in range(pwdSize))
 
 def parse_time(time):
    try:
@@ -159,7 +166,10 @@ def sounding(bot,update,job_queue,args):
    H = date.strftime('%H%M')
    url_picture = f'http://raspuri.mooo.com/RASP/'
    url_picture += f'{fol}/FCST/sounding{index}.curr.{H}lst.w2.png'
-   send_picture(bot, chatID, job_queue, url_picture, msg=txt, t=180,delete=True)
+   f_tmp = '/tmp/' + rand_name() + '.png'
+   urlretrieve(url_picture, f_tmp)
+   send_picture(bot, chatID, job_queue, f_tmp, msg=txt, t=60,delete=True)
+   os.system(f'rm {f_tmp}')
 
 
 ## Auxiliary ###################################################################
