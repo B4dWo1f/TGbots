@@ -72,6 +72,25 @@ def broadcast(bot, job):
       tool.send_picture(bot, Bcast_chatID, J, f, msg=txt,
                                           t=5*3600, delete=True, dis_notif=True)
 
+import aemet
+def check_storms(bot, job):
+   """
+   Check the storms forecast from aemet.
+   """
+   places = ['gre1', 'mad2']
+   w = 2
+   txt = 'AVISOS DE TORMENTA'
+   for p in places:
+      url = f'http://www.aemet.es/es/eltiempo/prediccion/montana?w={w}&p={p}'
+      P = aemet.parse_parte_aemet(url)
+      if P.storm != 'No se esperan':
+         txt += '\n'+ str(P)
+         M = bot.send_message(Bcast_chatID, text=txt, parse_mode='Markdown')
+         txt = ''
+   if txt == 'AVISOS DE TORMENTA': txt += 'No se esperan'
+   M = bot.send_message(Bcast_chatID, text=txt, parse_mode='Markdown')
+
+
 
 # Start Bot
 token, Bcast_chatID = CR.get_credentials('rasp.token')
@@ -100,6 +119,7 @@ D.add_handler(CommandHandler('tormentas', tool.tormentas, pass_args=True, pass_j
 J.run_daily(broadcast, dt.time(7,55))
 J.run_daily(broadcast, dt.time(12,45))
 J.run_daily(broadcast, dt.time(18,15))
+J.run_daily(check_storms, dt.time(7,30))
 
 
 U.start_polling()

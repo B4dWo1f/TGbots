@@ -53,7 +53,7 @@ class AemetMontana(object):
       msg += f'{self.valid}\n'
       msg += f'  - Estado del cielo: {self.sky}\n'
       msg += f'  - Precipitaciones: {self.precip}\n'
-      msg += f'  - **Tormentas: {self.storm}**\n'
+      msg += f'  - Tormentas: {self.storm}\n'
       msg += f'  - Temperaturas: {self.temp}\n'
       msg += f'  - Vientos: {self.wind}'
       return msg
