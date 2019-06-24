@@ -198,9 +198,9 @@ def tormentas(bot,update,job_queue,args):
    if len(args) == 0:
       usage()
       return
-   place = args[0].strip()
+   place = args[0].strip().lower()
    place = names[place]
-   date = ' '.join(args[1:])
+   date = ' '.join(args[1:]).lower()
    w = dates[date]
    url = f'http://www.aemet.es/es/eltiempo/prediccion/montana?w={w}&p={place}'
    txt = str(aemet.parse_parte_aemet(url))
