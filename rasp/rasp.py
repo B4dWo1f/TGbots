@@ -119,7 +119,7 @@ D.add_handler(CommandHandler('tormentas', tool.tormentas, pass_args=True, pass_j
 J.run_daily(broadcast, dt.time(7,55))
 J.run_daily(broadcast, dt.time(12,45))
 J.run_daily(broadcast, dt.time(18,15))
-J.run_daily(check_storms, dt.time(7,30))
+J.run_daily(check_storms, dt.time(8,30))
 
 
 U.start_polling()
