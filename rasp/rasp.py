@@ -4,7 +4,8 @@
 import aemet
 import credentials as CR
 from telegram.ext import Updater
-from telegram.ext import CommandHandler, MessageHandler, Filters
+from telegram.ext import CommandHandler as CH
+from telegram.ext import MessageHandler, Filters
 from threading import Thread
 import datetime as dt
 import tool
@@ -114,19 +115,21 @@ J = U.job_queue
 
 ## Add Handlers
 # Start
-D.add_handler(CommandHandler('start', start))
+D.add_handler(CH('start', start))
 # Re-Load
-D.add_handler(CommandHandler('reload', restart))
+D.add_handler(CH('reload', restart))
 # Stop
-D.add_handler(CommandHandler('stop', stop))
+D.add_handler(CH('stop', stop))
 # Hola
-D.add_handler(CommandHandler('hola', tool.hola))
+D.add_handler(CH('hola', tool.hola))
 # Forecast
-D.add_handler(CommandHandler('fcst', tool.fcst, pass_args=True, pass_job_queue=True))
+D.add_handler(CH('fcst', tool.fcst, pass_args=True, pass_job_queue=True))
+# CAPE
+D.add_handler(CH('cape', tool.cape, pass_args=True, pass_job_queue=True))
 # Sounding
-D.add_handler(CommandHandler('sounding', tool.sounding, pass_args=True, pass_job_queue=True))
+D.add_handler(CH('sounding', tool.sounding, pass_args=True, pass_job_queue=True))
 # Tormentas
-D.add_handler(CommandHandler('tormentas', tool.tormentas, pass_args=True, pass_job_queue=True))
+D.add_handler(CH('tormentas', tool.tormentas, pass_args=True, pass_job_queue=True))
 
 
 J.run_daily(broadcast, dt.time(7,55))
