@@ -110,7 +110,7 @@ def locate(date,prop):
    return fol,fname
 
 
-def cape(bot,update,job_queue,args):
+def general(bot,update,job_queue,args,prop):
    """ echo-like service to check system status """
    LG.info('received request: %s'%(update.message.text))
    chatID = update.message.chat_id
@@ -126,12 +126,14 @@ def cape(bot,update,job_queue,args):
       txt += '    /fcst al otro 14'
       bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
       return
-   _,f = locate(date, 'cape')
+   _,f = locate(date, prop)
    if f == None:
-      txt = 'Sorry, CAPE not available'
+      txt = 'Sorry, forecast not available'
       bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
       return
-   txt = 'CAPE for %s'%(date.strftime('%d/%m/%Y-%H:%M'))
+   prop_names = {'sfcwind':'Surface wind', 'blwind':'BL wind',
+                 'bltopwind':'top BL wind', 'cape':'CAPE'}
+   txt = prop_names[prop]+' for %s'%(date.strftime('%d/%m/%Y-%H:%M'))
    try:
       f = os.popen("grep %s %s"%(f, f_id_files)).read().strip().split()[-1]
    except: pass
@@ -142,37 +144,20 @@ def cape(bot,update,job_queue,args):
          fw.write(str(f)+'   '+str(f_ID)+'\n')
       fw.close()
 
+def cape(bot,update,job_queue,args):
+   general(bot,update,job_queue,args,'cape')
+
 def fcst(bot,update,job_queue,args):
-   """ echo-like service to check system status """
-   LG.info('received request: %s'%(update.message.text))
-   chatID = update.message.chat_id
-   d = ' '.join(args)
-   try: date = parser_date(d)
-   except:
-      txt = 'Sorry, I didn\'t understand\n'
-      txt += 'Usage: /fcst %d/%m/%Y-%H:%M\n'
-      txt += '       /fcst [hoy/mañana/pasado/al otro] %H\n'
-      txt += '       /fcst [hoy/mañana/pasado/al otro] %H:%M\n'
-      txt += 'ex: /fcst 18/05/2019-13:00\n'
-      txt += '    /fcst mañana 13:00\n'
-      txt += '    /fcst al otro 14'
-      bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
-      return
-   _,f = locate(date, 'sfcwind')
-   if f == None:
-      txt = 'Sorry, forecast not available'
-      bot.send_message(chat_id=chatID, text=txt, parse_mode='Markdown')
-      return
-   txt = 'Surface wind for %s'%(date.strftime('%d/%m/%Y-%H:%M'))
-   try:
-      f = os.popen("grep %s %s"%(f, f_id_files)).read().strip().split()[-1]
-   except: pass
-   M = send_picture(bot, chatID, job_queue, f, msg=txt, t=180,delete=True)
-   f_ID = M['photo'][-1]['file_id']
-   if f[0] == '/':   # means that f is the abs path of the file
-      with open(f_id_files,'a') as fw:
-         fw.write(str(f)+'   '+str(f_ID)+'\n')
-      fw.close()
+   general(bot,update,job_queue,args,'sfcwind')
+
+def sfcwind(bot,update,job_queue,args):
+   general(bot,update,job_queue,args,'sfcwind')
+
+def blwind(bot,update,job_queue,args):
+   general(bot,update,job_queue,args,'blwind')
+
+def bltopwind(bot,update,job_queue,args):
+   general(bot,update,job_queue,args,'bltopwind')
 
 
 def sounding(bot,update,job_queue,args):

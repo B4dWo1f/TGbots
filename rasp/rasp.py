@@ -124,6 +124,12 @@ D.add_handler(CH('stop', stop))
 D.add_handler(CH('hola', tool.hola))
 # Forecast
 D.add_handler(CH('fcst', tool.fcst, pass_args=True, pass_job_queue=True))
+# Surface Wind
+D.add_handler(CH('sfcwind', tool.sfcwind, pass_args=True, pass_job_queue=True))
+# BL Wind
+D.add_handler(CH('blwind', tool.blwind, pass_args=True, pass_job_queue=True))
+# top BL Wind
+D.add_handler(CH('bltopwind', tool.bltopwind, pass_args=True, pass_job_queue=True))
 # CAPE
 D.add_handler(CH('cape', tool.cape, pass_args=True, pass_job_queue=True))
 # Sounding
